@@ -3,7 +3,7 @@
  * 
  * @class Button
  */
-export default class Button{
+class Button{
   /**
    * Creates an instance of Button. You shouldn't need to use this, Buttons are generated with a Launchpad instance.
    * @param {Launchpad} launchpad The Launchpad this button belongs to.
@@ -24,8 +24,6 @@ export default class Button{
      */
     this.note = note;
 
-    const noteAsString = note.toString().split("");
-
     /**
      * The x-coordinate of this button.
      * @type {Number}
@@ -37,12 +35,6 @@ export default class Button{
      * @type {Number}
      */
     this.y = note % 10;
-
-    /**
-     * The current color of the button.
-     * @type {Number}
-     */
-    this.color = 0;
   }
 
   /**
@@ -105,3 +97,5 @@ export default class Button{
     this.launchpad._output.sendMessage([144, this.note, 0])
   }
 }
+
+module.exports = Button;
