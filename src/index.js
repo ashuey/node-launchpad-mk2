@@ -1,6 +1,6 @@
 const midi = require('midi'),
-      Button = require('./helpers/button'),
-      EventEmitter = require('events');
+  Button = require('./helpers/button'),
+  EventEmitter = require('events');
 
 const layouts = {
   NOTE: 0,
@@ -11,42 +11,42 @@ const layouts = {
 
 /**
  * A Launchpad instance.
- * 
+ *
  * This class will emit two events:
- * 
+ *
  * - `press` - Emitted when a button is pressed. Example usage:
- * 
+ *
  * ```js
  * myLaunchpad.on("press", pressInfo => {
  *   console.log(pressInfo.button, pressInfo.velocity)
  * })
  * ```
- * 
+ *
  * - `release` - Emitted when a button is released. Example usage:
- * 
+ *
  * ```js
  * myLaunchpad.on("release", button => {
  *   console.log(button)
  * })
  * ```
- * 
+ *
  * @class Launchpad
  * @extends {EventEmitter}
  */
 class Launchpad extends EventEmitter {
   /**
    * Creates an instance of Launchpad.
-   * 
+   *
    * @param {Object} params The paramaters to instantiate the Launchpad.
    * @param {Number} params.in The input port of the Launchpad.
    * @param {Number} params.out The output port of the Launchpad.
-   * 
+   *
    * @example
    * let myLaunchpad = new Launchpad({
    *   in: 1,
    *   out: 1
    * })
-   * 
+   *
    * @memberOf Launchpad
    */
   constructor(params) {
@@ -56,62 +56,62 @@ class Launchpad extends EventEmitter {
      * All the buttons on this Launchpad. Get one by using `getButton`.
      * @type {Button[]}
      */
-    this.buttons = [ ];
-    
+    this.buttons = [];
+
     this._input = new midi.input();
     this._output = new midi.output();
 
     this._input.openPort(params.in);
 
     this._input.on("message", (dTime, message) => {
-      if(message[0] === 176 || message[0] === 144){
+      if (message[0] === 176 || message[0] === 144) {
         // button message
-        if(message[2] > 0) {
-            /**
-             * Fired when a button is pressed.
-             *
-             * @event Launchpad#press
-             * @type {object}
-             * @property {Button} button The button that was pressed
-             * @property {Number} velocity The velocity at which the button was pressed
-             */
-            this.emit("press", {
-                button: this.buttons[message[1]],
-                velocity: message[2]
-            });
+        if (message[2] > 0) {
+          /**
+           * Fired when a button is pressed.
+           *
+           * @event Launchpad#press
+           * @type {object}
+           * @property {Button} button The button that was pressed
+           * @property {Number} velocity The velocity at which the button was pressed
+           */
+          this.emit("press", {
+            button: this.buttons[message[1]],
+            velocity: message[2]
+          });
         } else {
-            /**
-             * Fired when a button is released.
-             *
-             * @event Launchpad#release
-             * @type {Button}
-             */
-            this.emit("release", this.buttons[message[1]]);
+          /**
+           * Fired when a button is released.
+           *
+           * @event Launchpad#release
+           * @type {Button}
+           */
+          this.emit("release", this.buttons[message[1]]);
         }
       }
     });
 
     this._output.openPort(params.out);
 
-    for(let i=0;i<112;i++) {
-        this.buttons.push(new Button(this, i));
+    for (let i = 0; i < 112; i++) {
+      this.buttons.push(new Button(this, i));
     }
   }
 
   /**
    * Convenience method to add the system-exclusive message header to a message
    * and then send it to the Launchpad.
-   * 
+   *
    * @param {Number[]} bytes The bytes of the SysEx message to send. Header is automatically included.
-   * 
+   *
    * @example
    * myLaunchpad.sendSysEx([0, 1, 2, 3])
-   * 
+   *
    * @memberOf Launchpad
    */
-  sendSysEx(bytes){
+  sendSysEx(bytes) {
     // sysex header
-    const message = [240, 0, 32, 41, 2, 16];
+    const message = [240, 0, 32, 41, 2, 24];
     // sysex message
     bytes.forEach(byte => message.push(byte));
     // sysex terminator
@@ -122,37 +122,37 @@ class Launchpad extends EventEmitter {
 
   /**
    * Get a button on this Launchpad
-   * 
+   *
    * @param {Number} x The x-coordinate of the button.
    * @param {Number} y The y-coordinate of the button.
    * @returns {Button}
-   * 
+   *
    * @example
    * let button = myLaunchpad.getButton(1, 2)
-   * 
+   *
    * // do whatever with the button
    * button.setRgbColor(10, 30, 10)
-   * 
+   *
    * @memberOf Launchpad
    */
   getButton(x, y) {
-      let note = (10 * y) + x;
+    let note = (10 * y) + x;
 
-      if (note > 90) {
-          note += 13;
-      }
+    if (note > 90) {
+      note += 13;
+    }
 
-      return this.buttons[note];
+    return this.buttons[note];
   }
 
   /**
    * Convenience method to light up all the buttons on the Launchpad a certain color.
-   * 
+   *
    * @param {Number} color Note representation of the color.
-   * 
+   *
    * @example
    * myLaunchpad.lightAll(23)
-   * 
+   *
    * @memberOf Launchpad
    */
   lightAll(color) {
@@ -161,14 +161,14 @@ class Launchpad extends EventEmitter {
 
   /**
    * Convenience method to light up all the buttons on the Launchpad a certain color with RGB values.
-   * 
+   *
    * @param {Number} r Red value. 0-63
    * @param {Number} g Green value. 0-63
    * @param {Number} b Blue value. 0-63
-   * 
+   *
    * @example
    * myLaunchpad.lightAllRgb(10, 30, 10)
-   * 
+   *
    * @memberOf Launchpad
    */
   lightAllRgb(r, g, b) {
@@ -177,10 +177,10 @@ class Launchpad extends EventEmitter {
 
   /**
    * Convenience method to darken all buttons on the Launchpad.
-   * 
+   *
    * @example
    * myLaunchpad.darkAll()
-   * 
+   *
    * @memberOf Launchpad
    */
   darkAll() {
@@ -189,12 +189,12 @@ class Launchpad extends EventEmitter {
 
   /**
    * Set the Launchpad's layout.
-   * 
+   *
    * @param {String} layout The layout you want to switch to. Can be one of _NOTE, DRUM, FADER, PROGRAMMER_.
-   * 
+   *
    * @example
    * myLaunchpad.toLayout("PROGRAMMER")
-   * 
+   *
    * @memberOf Launchpad
    */
   toLayout(layout) {
@@ -203,15 +203,15 @@ class Launchpad extends EventEmitter {
 
   /**
    * Scroll text across the Launchpad.
-   * 
+   *
    * @param {String} text The text to scroll.
    * @param {Number} color Note representation of the text color.
    * @param {Boolean} loop If true, will loop the text scrolling until another text scroll message is sent.
    * @param {Number} speed The speed of the text scrolling. 1-7
-   * 
+   *
    * @example
    * myLaunchpad.scrollText("Hello node!", 23, true, 5)
-   * 
+   *
    * @memberOf Launchpad
    */
   scrollText(text, color, loop, speed) {
@@ -219,13 +219,13 @@ class Launchpad extends EventEmitter {
 
     loop = loop ? 1 : 0;
 
-    for(let i=0;i<text.length;i++) {
-        message.push(text.charCodeAt(i));
+    for (let i = 0; i < text.length; i++) {
+      message.push(text.charCodeAt(i));
     }
-    
+
     this.sendSysEx(message);
 
-    if(speed) {
+    if (speed) {
       this.sendSysEx([20, color, loop, speed]);
     }
   }
