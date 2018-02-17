@@ -94,7 +94,7 @@ class Launchpad extends EventEmitter {
     this._output.openPort(params.out);
 
     for(let i=0;i<100;i++) {
-        this.buttons.push(new Button(self, i));
+        this.buttons.push(new Button(this, i));
     }
   }
 
