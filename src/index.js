@@ -136,7 +136,13 @@ class Launchpad extends EventEmitter {
    * @memberOf Launchpad
    */
   getButton(x, y) {
-    return this.buttons[(x.toString() === "0" ? "" : x.toString()) + y.toString()];
+      let note = (10 * y) + x;
+
+      if (note > 90) {
+          note += 13;
+      }
+
+      return this.buttons[note];
   }
 
   /**
@@ -178,7 +184,7 @@ class Launchpad extends EventEmitter {
    * @memberOf Launchpad
    */
   darkAll() {
-    this.buttons.forEach(button => button.setColor(0));
+    this.lightAll(0);
   }
 
   /**

@@ -24,17 +24,19 @@ class Button{
      */
     this.note = note;
 
+    let tempNote = (note > 90) ? note - 13 : note;
+
     /**
      * The x-coordinate of this button.
      * @type {Number}
      */
-    this.x = Math.floor(note / 10);
+    this.x = tempNote % 10;
 
     /**
      * The y-coordinate of this button.
      * @type {Number}
      */
-    this.y = note % 10;
+    this.y = Math.floor(tempNote / 10);
   }
 
   /**
