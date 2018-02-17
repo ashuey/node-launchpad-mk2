@@ -1,14 +1,13 @@
 const midi = require('midi'),
       Button = require('./helpers/button'),
-      EventEmitter = require('events'),
-      util = require('util')
+      EventEmitter = require('events');
 
-var layouts = {
+const layouts = {
   NOTE: 0,
   DRUM: 1,
   FADE: 2,
   PROGRAMMER: 3
-}
+};
 
 /**
  * A Launchpad instance.
@@ -51,50 +50,52 @@ export default class Launchpad extends EventEmitter {
    * @memberOf Launchpad
    */
   constructor(params) {
-    super()
+    super();
 
     /**
      * All the buttons on this Launchpad. Get one by using `getButton`.
      * @type {Button[]}
      */
-    this.buttons = [ ]
+    this.buttons = [ ];
     
-    this._input = new midi.input()
-    this._output = new midi.output()
+    this._input = new midi.input();
+    this._output = new midi.output();
 
-    this._input.openPort(params.in)
+    this._input.openPort(params.in);
 
     this._input.on("message", (dTime, message) => {
       if(message[0] === 176 || message[0] === 144){
         // button message
-        if(message[2] > 0)
-          /**
-           * Fired when a button is pressed.
-           * 
-           * @event Launchpad#press
-           * @type {object}
-           * @property {Button} button The button that was pressed
-           * @property {Number} velocity The velocity at which the button was pressed
-           */
-          this.emit("press", {
-            button: this.buttons[message[1]],
-            velocity: message[2]
-          })
-        else
-          /**
-           * Fired when a button is released.
-           * 
-           * @event Launchpad#release
-           * @type {Button}
-           */
-          this.emit("release", this.buttons[message[1]])
+        if(message[2] > 0) {
+            /**
+             * Fired when a button is pressed.
+             *
+             * @event Launchpad#press
+             * @type {object}
+             * @property {Button} button The button that was pressed
+             * @property {Number} velocity The velocity at which the button was pressed
+             */
+            this.emit("press", {
+                button: this.buttons[message[1]],
+                velocity: message[2]
+            });
+        } else {
+            /**
+             * Fired when a button is released.
+             *
+             * @event Launchpad#release
+             * @type {Button}
+             */
+            this.emit("release", this.buttons[message[1]]);
+        }
       }
-    })
+    });
 
-    this._output.openPort(params.out)
+    this._output.openPort(params.out);
 
-    for(var i=0;i<100;i++)
-      this.buttons.push(new Button(self, i))
+    for(let i=0;i<100;i++) {
+        this.buttons.push(new Button(self, i));
+    }
   }
 
   /**
@@ -110,13 +111,13 @@ export default class Launchpad extends EventEmitter {
    */
   sendSysEx(bytes){
     // sysex header
-    var message = [240, 0, 32, 41, 2, 16]
+    const message = [240, 0, 32, 41, 2, 16];
     // sysex message
-    bytes.forEach(byte => message.push(byte))
+    bytes.forEach(byte => message.push(byte));
     // sysex terminator
-    message.push(247)
+    message.push(247);
     // console.log("sysex", message)
-    this._output.sendMessage(message)
+    this._output.sendMessage(message);
   }
 
   /**
@@ -135,7 +136,7 @@ export default class Launchpad extends EventEmitter {
    * @memberOf Launchpad
    */
   getButton(x, y) {
-    return this.buttons[(x.toString() === "0" ? "" : x.toString()) + y.toString()]
+    return this.buttons[(x.toString() === "0" ? "" : x.toString()) + y.toString()];
   }
 
   /**
@@ -149,7 +150,7 @@ export default class Launchpad extends EventEmitter {
    * @memberOf Launchpad
    */
   lightAll(color) {
-    this.sendSysEx([14, color])
+    this.sendSysEx([14, color]);
   }
 
   /**
@@ -165,7 +166,7 @@ export default class Launchpad extends EventEmitter {
    * @memberOf Launchpad
    */
   lightAllRgb(r, g, b) {
-    this.buttons.forEach(button => button.setRgbColor(r, g, b))
+    this.buttons.forEach(button => button.setRgbColor(r, g, b));
   }
 
   /**
@@ -177,7 +178,7 @@ export default class Launchpad extends EventEmitter {
    * @memberOf Launchpad
    */
   darkAll() {
-    this.buttons.forEach(button => button.setColor(0))
+    this.buttons.forEach(button => button.setColor(0));
   }
 
   /**
@@ -191,7 +192,7 @@ export default class Launchpad extends EventEmitter {
    * @memberOf Launchpad
    */
   toLayout(layout) {
-    this._output.sendMessage([240, 0, 32, 41, 2, 16, 44, layouts[layout], 247])
+    this._output.sendMessage([240, 0, 32, 41, 2, 16, 44, layouts[layout], 247]);
   }
 
   /**
@@ -208,14 +209,18 @@ export default class Launchpad extends EventEmitter {
    * @memberOf Launchpad
    */
   scrollText(text, color, loop, speed) {
-    var message = [20, color, loop]
+    const message = [20, color, loop];
 
-    loop = loop ? 1 : 0
+    loop = loop ? 1 : 0;
 
-    for(var i=0;i<text.length;i++)
-      message.push(text.charCodeAt(i))
+    for(let i=0;i<text.length;i++) {
+        message.push(text.charCodeAt(i));
+    }
     
-    this.sendSysEx(message)
-    if(speed) this.sendSysEx([20, color, loop, speed])
+    this.sendSysEx(message);
+
+    if(speed) {
+      this.sendSysEx([20, color, loop, speed]);
+    }
   }
 }

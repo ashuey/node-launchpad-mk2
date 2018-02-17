@@ -16,47 +16,33 @@ export default class Button{
      * The Launchpad this button belongs to.
      * @type {Launchpad}
      */
-    this.launchpad = launchpad
+    this.launchpad = launchpad;
 
     /**
      * The note representation of this button.
      * @type {Number}
      */
-    this.note = note
+    this.note = note;
 
-    var noteAsString = note.toString().split("")
+    const noteAsString = note.toString().split("");
 
     /**
      * The x-coordinate of this button.
      * @type {Number}
      */
-    this.x = null
+    this.x = Math.floor(note / 10);
 
     /**
      * The y-coordinate of this button.
      * @type {Number}
      */
-    this.y = null
-
-    if(noteAsString[1] === "0"){
-      // left button
-      this.x = 0
-      this.y = parseInt(noteAsString[0])
-    }else if(!noteAsString[1]){
-      // bottom button
-      this.x = parseInt(noteAsString[0])
-      this.y = 0
-    }else{
-      // any other
-      this.x = parseInt(noteAsString[1]) || 0
-      this.y = parseInt(noteAsString[0]) || 0
-    }
+    this.y = note % 10;
 
     /**
      * The current color of the button.
      * @type {Number}
      */
-    this.color = 0
+    this.color = 0;
   }
 
   /**
